@@ -24,7 +24,7 @@ class FavoriteHolder(view: View) : RecyclerView.ViewHolder(view) {
     fun bind(context: Context, id: Long, title: String?, url: String, color: Int) {
         val adjustedTitle = title?.takeUnless {
             it.isEmpty()
-        } ?: url.split("/").toTypedArray()[2]
+        } ?: ("$url//?").split("/").toTypedArray()[2]
         this.rowFavoriteTitle.text = adjustedTitle
         this.rowFavoriteTitle.setTextColor(if (UiUtils.isColorLight(color)) Color.BLACK else Color.WHITE)
         rowFavoriteCard.setCardBackgroundColor(color)

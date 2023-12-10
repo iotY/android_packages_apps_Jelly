@@ -161,7 +161,8 @@ class FavoriteActivity : AppCompatActivity() {
         title: String, url: String
     ) {
         withContext(Dispatchers.Default) {
-            FavoriteProvider.updateItem(contentResolver, id, title, url)
+            if (url.isEmpty()) FavoriteProvider.updateItem(contentResolver, id, title, "about:blank")
+            else FavoriteProvider.updateItem(contentResolver, id, title, url)
         }
     }
 

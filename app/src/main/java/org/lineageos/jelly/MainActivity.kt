@@ -71,6 +71,7 @@ import org.lineageos.jelly.utils.AdBlocker
 import org.lineageos.jelly.utils.IntentUtils
 import org.lineageos.jelly.utils.PermissionsUtils
 import org.lineageos.jelly.utils.SharedPreferencesExt
+import org.lineageos.jelly.utils.TabUtils
 import org.lineageos.jelly.utils.TabUtils.openInNewTab
 import org.lineageos.jelly.utils.UiUtils
 import org.lineageos.jelly.utils.UrlUtils
@@ -739,6 +740,8 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
                 }
                 "newtab" -> c.startActivity(Intent(c, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 "favorites" -> c.startActivity(Intent(c, FavoriteActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                "history" -> c.startActivity(Intent(c, HistoryActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                "killall" -> TabUtils.killAll(c)
             }
             return true
         }

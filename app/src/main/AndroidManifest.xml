@@ -135,6 +135,28 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE"/>
             </intent-filter>
         </service>
+        <service
+            android:name="org.lineageos.jelly.tiles.HistoryTile"
+            android:enabled="true"
+            android:icon="@drawable/ic_history"
+            android:label="@string/menu_history"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.lineageos.jelly.tiles.KillAll"
+            android:enabled="true"
+            android:icon="@drawable/ic_menu_kill_all"
+            android:label="@string/kill_all"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="android.webkit.WebView.EnableSafeBrowsing"

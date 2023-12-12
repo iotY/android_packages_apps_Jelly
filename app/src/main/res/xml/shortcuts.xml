@@ -24,7 +24,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="org.lineageos.jelly.MainActivity"
-            android:targetPackage="org.lineageos.jelly">
+            android:targetPackage="org.lineageos.jelly.dev">
             <extra
                 android:name="extra_incognito"
                 android:value="true" />
@@ -32,16 +32,16 @@
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
     <shortcut
-        android:shortcutId="newtab"
+        android:shortcutId="history"
         android:enabled="true"
-        android:icon="@drawable/ic_new_tab"
+        android:icon="@drawable/ic_history"
         android:shortcutDisabledMessage="@string/shortcut_disabled"
-        android:shortcutLongLabel="@string/shortcut_in_new_tab"
-        android:shortcutShortLabel="@string/shortcut_in_new_tab">
+        android:shortcutLongLabel="@string/menu_history"
+        android:shortcutShortLabel="@string/menu_history">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="org.lineageos.jelly"
-            android:targetClass="org.lineageos.jelly.MainActivity" />
+            android:targetPackage="org.lineageos.jelly.dev"
+            android:targetClass="org.lineageos.jelly.history.HistoryActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
     <shortcut
@@ -53,8 +53,38 @@
         android:shortcutShortLabel="@string/shortcut_favorites">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="org.lineageos.jelly"
+            android:targetPackage="org.lineageos.jelly.dev"
             android:targetClass="org.lineageos.jelly.favorite.FavoriteActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="newtab"
+        android:enabled="true"
+        android:icon="@drawable/ic_new_tab"
+        android:shortcutDisabledMessage="@string/shortcut_disabled"
+        android:shortcutLongLabel="@string/menu_new_tab"
+        android:shortcutShortLabel="@string/menu_new_tab">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="org.lineageos.jelly.dev"
+            android:targetClass="org.lineageos.jelly.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="killall"
+        android:enabled="true"
+        android:icon="@drawable/ic_menu_kill_all"
+        android:shortcutDisabledMessage="@string/shortcut_disabled"
+        android:shortcutLongLabel="@string/kill_all"
+        android:shortcutShortLabel="@string/kill_all">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="org.lineageos.jelly.dev"
+            android:targetClass="org.lineageos.jelly.LaunchFileActivity" > //TODO +/- |.dev|
+            <extra
+                android:name="kill_all"
+                android:value="true" />
+        </intent>
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
 </shortcuts>

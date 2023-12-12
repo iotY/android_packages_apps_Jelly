@@ -52,6 +52,12 @@
     <!-- Menu action: print -->
     <string name="menu_print">Print</string>
 
+    <string name="tabs_info">\u2936LongClick\u205E\nTabs manager</string>
+    <string name="kill_all">kill_all Tabs</string>
+    <string name="kill_others">kill_others</string>
+    <string name="kill_this">kill_this</string>
+
+
     <!-- Share webPage: "send to" dialog title -->
     <string name="share_title">Send to</string>
 

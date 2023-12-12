@@ -47,6 +47,10 @@ class MenuDialog(
     private val printButton by lazy { view.findViewById<LinearLayout>(R.id.printButton) }
     private val settingsButton by lazy { view.findViewById<LinearLayout>(R.id.settingsButton) }
 
+    private val killAll by lazy { view.findViewById<LinearLayout>(R.id.kill_all) }
+    private val killThis by lazy { view.findViewById<LinearLayout>(R.id.kill_this) }
+    private val killOthers by lazy { view.findViewById<LinearLayout>(R.id.kill_others) }
+
     private val popupWindow = PopupWindow(
         view,
         RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -79,6 +83,7 @@ class MenuDialog(
         DESKTOP_VIEW,
         PRINT,
         SETTINGS,
+        KILL_ALL,KILL_THIS,KILL_OTHERS,
     }
 
     init {
@@ -100,6 +105,10 @@ class MenuDialog(
         desktopViewSwitch.setOnCheckedChangeListener { _, _ -> triggerOption(Option.DESKTOP_VIEW) }
         printButton.setOnClickListener { triggerOption(Option.PRINT) }
         settingsButton.setOnClickListener { triggerOption(Option.SETTINGS) }
+
+        killAll.setOnClickListener { triggerOption(Option.KILL_ALL)}
+        killThis.setOnClickListener { triggerOption(Option.KILL_THIS)}
+        killOthers.setOnClickListener { triggerOption(Option.KILL_OTHERS)}
     }
 
     fun showAsDropdownMenu(anchor: View, isReachMode: Boolean = false) {

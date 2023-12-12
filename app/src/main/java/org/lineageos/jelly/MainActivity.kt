@@ -6,6 +6,7 @@
 package org.lineageos.jelly
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.ActivityManager.TaskDescription
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
@@ -24,6 +25,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.os.Process
 import android.os.ResultReceiver
 import android.print.PrintAttributes
 import android.print.PrintManager
@@ -229,6 +231,26 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
                     menuDialog.isDesktopMode = !isDesktop
                 }
                 MenuDialog.Option.SETTINGS -> startActivity(Intent(this, SettingsActivity::class.java))
+                else -> {
+                    val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+                    val tasks = am.appTasks
+                    if (tasks != null && tasks.size > 0) {
+                        if (option != MenuDialog.Option.KILL_THIS) {
+                            for (i in 1 until tasks.size) {
+                                tasks[i].setExcludeFromRecents(true)
+                                tasks[i].finishAndRemoveTask()
+                            }
+                        }
+                        if (option != MenuDialog.Option.KILL_OTHERS) {
+                            tasks[0].setExcludeFromRecents(true)
+                            tasks[0].finishAndRemoveTask()
+                        }
+                    }
+                    if (option == MenuDialog.Option.KILL_ALL) {
+                        Process.killProcess(Process.myPid())
+                    }
+
+                }
             }
             menuDialog.dismiss()
         }

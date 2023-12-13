@@ -137,6 +137,16 @@
                         app:drawableStartCompat="@drawable/ic_file_download" />
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/saveButton"
+                    style="@style/Theme.Jelly.MenuItem">
+
+                    <TextView
+                        style="@style/Theme.Jelly.MenuItemTitle"
+                        android:text="@string/save_url_mht"
+                        app:drawableStartCompat="@drawable/ic_save" />
+                </LinearLayout>
+
                 <com.google.android.material.divider.MaterialDivider style="@style/Theme.Jelly.MenuDivider" />
 
                 <LinearLayout

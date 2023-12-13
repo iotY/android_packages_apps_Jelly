@@ -40,10 +40,13 @@ import android.webkit.CookieManager
 import android.webkit.GeolocationPermissions
 import android.webkit.MimeTypeMap
 import android.webkit.WebChromeClient.CustomViewCallback
+import android.webkit.WebSettings
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -77,7 +80,9 @@ import org.lineageos.jelly.utils.UiUtils
 import org.lineageos.jelly.utils.UrlUtils
 import org.lineageos.jelly.webview.WebViewExt
 import org.lineageos.jelly.webview.WebViewExtActivity
+import java.io.BufferedInputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -157,6 +162,28 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
         }
     }
 
+    private val startForResultSaveArchive = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri: Uri = result.data!!.data!!
+            webView.saveWebArchive(pathSaveWebArchive() + nameSaveWebArchive(), false) { s: String? ->
+                if (s != null) {
+                    try {
+                        //val input: InputStream = BufferedInputStream(FileInputStream(File(s).absoluteFile) as InputStream?)
+                        val pfd = baseContext.contentResolver.openFileDescriptor(uri, "w")
+                        BufferedInputStream(FileInputStream(File(s).absoluteFile)).use { stream ->
+                            stream.copyTo(FileOutputStream(pfd!!.fileDescriptor))
+                            //stream.copyTo(FileOutputStream(File(uri.getPath()!!)))
+                        }
+                        pfd!!.close()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+            // Perform operations on the document using its URI.
+        } else webView.saveWebArchive(pathSaveWebArchive() + nameSaveWebArchive())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -217,7 +244,7 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
                 MenuDialog.Option.FAVORITES -> startActivity(Intent(this, FavoriteActivity::class.java))
                 MenuDialog.Option.HISTORY -> startActivity(Intent(this, HistoryActivity::class.java))
                 MenuDialog.Option.DOWNLOADS -> startActivity(Intent(DownloadManager.ACTION_VIEW_DOWNLOADS))
-                MenuDialog.Option.ADD_TO_HOME_SCREEN -> addShortcut()
+                MenuDialog.Option.ADD_TO_HOME_SCREEN -> addShortcut(webView.getTitle()!!, webView.getUrl()!!)
                 MenuDialog.Option.PRINT -> {
                     val printManager = getSystemService(PrintManager::class.java)
                     val documentName = "Jelly document"
@@ -232,6 +259,24 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
                     menuDialog.isDesktopMode = !isDesktop
                 }
                 MenuDialog.Option.SETTINGS -> startActivity(Intent(this, SettingsActivity::class.java))
+                MenuDialog.Option.SAVE -> {
+                    if (Build.VERSION.SDK_INT < 29) {
+                        webView.saveWebArchive(pathSaveWebArchive() + nameSaveWebArchive())
+                    } else {
+                        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                        intent.addCategory(Intent.CATEGORY_OPENABLE)
+                        intent.type = "text/mht"
+                        intent.putExtra(Intent.EXTRA_TITLE, nameSaveWebArchive())
+                        startForResultSaveArchive.launch(intent)
+                    }
+                    addShortcut("\u2707" + webView.title, "file:///" + pathSaveWebArchive() + nameSaveWebArchive())
+                    uiScope.launch {
+                        setAsFavorite("\u2707" + webView.title, pathSaveWebArchive() + nameSaveWebArchive())
+                    }
+                    Toast.makeText(this, "\u2707" + getExternalFilesDir(null), Toast.LENGTH_LONG).show()
+
+                }
+
                 else -> {
                     val am = getSystemService(ACTIVITY_SERVICE) as ActivityManager
                     val tasks = am.appTasks
@@ -262,6 +307,13 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
 
         webView.init(this, urlBarLayout, incognito)
         webView.isDesktopMode = desktopMode
+        webView.settings.domStorageEnabled = true
+        webView.settings.allowContentAccess = true
+        webView.settings.allowFileAccessFromFileURLs = true
+        webView.settings.allowFileAccess = true
+        webView.settings.cacheMode = WebSettings.LOAD_NORMAL
+        webView.settings.allowUniversalAccessFromFileURLs = true
+
         webView.loadUrl(url ?: sharedPreferencesExt.homePage)
         AdBlocker.init(this)
         setUiMode()
@@ -623,17 +675,17 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
         this.customView = null
     }
 
-    private fun addShortcut() {
+    private fun addShortcut(sTitle: String, sUrl: String) {
         val intent = Intent(this, MainActivity::class.java).apply {
-            data = Uri.parse(webView.url)
+            data = Uri.parse(sUrl)
             action = Intent.ACTION_MAIN
         }
         val launcherIcon = urlIcon?.let {
             IconCompat.createWithBitmap(UiUtils.getShortcutIcon(it, Color.WHITE))
         } ?: IconCompat.createWithResource(this, R.mipmap.ic_launcher)
-        val title = webView.title.toString()
-        val shortcutInfoCompat = ShortcutInfoCompat.Builder(this, title)
-            .setShortLabel(title)
+        //val title = webView.title.toString()
+        val shortcutInfoCompat = ShortcutInfoCompat.Builder(this, sTitle)
+            .setShortLabel(sTitle)
             .setIcon(launcherIcon)
             .setIntent(intent)
             .build()
@@ -722,6 +774,16 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
                 false -> ConstraintLayout.LayoutParams.UNSET
             }
         }
+    }
+
+    private fun pathSaveWebArchive(): String? {
+        return (getExternalFilesDir(null).toString() //not working gradle: targetSdkVersion 30
+                + File.separator)
+    }
+
+    private fun nameSaveWebArchive(): String? {
+        return (webView.title!!.replace("[^a-zA-Z0-9\\-]".toRegex(), "_")
+                + ".mht")
     }
 
     companion object {

@@ -50,6 +50,7 @@ class MenuDialog(
     private val killAll by lazy { view.findViewById<LinearLayout>(R.id.kill_all) }
     private val killThis by lazy { view.findViewById<LinearLayout>(R.id.kill_this) }
     private val killOthers by lazy { view.findViewById<LinearLayout>(R.id.kill_others) }
+    private val saveArchive by lazy { view.findViewById<LinearLayout>(R.id.saveButton) }
 
     private val popupWindow = PopupWindow(
         view,
@@ -77,6 +78,7 @@ class MenuDialog(
         NEW_PRIVATE_TAB,
         FAVORITES,
         HISTORY,
+        SAVE,
         DOWNLOADS,
         ADD_TO_HOME_SCREEN,
         FIND_IN_PAGE,
@@ -109,6 +111,7 @@ class MenuDialog(
         killAll.setOnClickListener { triggerOption(Option.KILL_ALL)}
         killThis.setOnClickListener { triggerOption(Option.KILL_THIS)}
         killOthers.setOnClickListener { triggerOption(Option.KILL_OTHERS)}
+        saveArchive.setOnClickListener { triggerOption(Option.SAVE)}
     }
 
     fun showAsDropdownMenu(anchor: View, isReachMode: Boolean = false) {

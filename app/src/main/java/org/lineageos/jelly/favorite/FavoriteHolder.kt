@@ -30,7 +30,10 @@ class FavoriteHolder(view: View) : RecyclerView.ViewHolder(view) {
         rowFavoriteCard.setCardBackgroundColor(color)
         rowFavoriteCard.setOnClickListener {
             val intent = Intent(context, MainActivity::class.java).apply {
-                data = Uri.parse(url)
+                if (adjustedTitle.startsWith("\u2707")){
+                    setDataAndType(Uri.parse("file:///"+url),"application/octet-stream")
+                    action = Intent.ACTION_VIEW
+                } else data = Uri.parse(url)
             }
             context.startActivity(intent)
         }

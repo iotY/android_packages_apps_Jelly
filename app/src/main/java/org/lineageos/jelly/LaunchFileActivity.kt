@@ -20,15 +20,9 @@ import java.io.*
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
-import javax.mail.MessagingException
-import javax.mail.Multipart
-import javax.mail.Session
-import javax.mail.internet.MimeBodyPart
-import javax.mail.internet.MimeMessage
 
 class LaunchFileActivity : AppCompatActivity() {
     private var url: String? = null
-    private var emlPart = 0
     private var fos: FileOutputStream? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +72,6 @@ class LaunchFileActivity : AppCompatActivity() {
 
     private fun urlCacheLocalUri(uri: Uri?) {
         var sMime = ""
-        var bEml = false
         if (intent!!.dataString == null || !intent!!.dataString!!.substring(intent!!.dataString!!.lastIndexOf("/")).contains(".")) {
             if (contentResolver.getType(uri!!) != null) {
                 sMime = "." + MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri))
@@ -89,116 +82,27 @@ class LaunchFileActivity : AppCompatActivity() {
                     if (sMime == ".*") sMime = mimeHead(uri)
                 } else if (sMime == ".eml") {
                     sMime = ".html"
-                    bEml = true
                 }
             } else sMime = mimeHead(uri)
         } else if (intent!!.dataString!!.endsWith(")")) sMime = mimeHead(uri)
         if (uri.toString().endsWith(".eml") || mimeHead(uri) == ".eml") {
             sMime = ".html"
-            bEml = true
         }
         val f = File(baseContext.cacheDir, uri!!.lastPathSegment!!.replace(":", "").replace("/", ".")
                 + sMime)
         try {
             fos = FileOutputStream(f)
             val input = baseContext.contentResolver.openInputStream(uri)
-            if (bEml) {
-                val props = System.getProperties()
-                props["mail.host"] = "smtp.dummydomain.com"
-                props["mail.transport.protocol"] = "smtp"
-                val mailSession: Session = Session.getDefaultInstance(props, null)
-                val message = MimeMessage(mailSession, input)
-                rfcHead(message, mailSession)
-                fos!!.flush()
-                fos!!.close()
-            } else {
-                val buffer = ByteArray(1024 * 4)
-                var n = 0
-                while (-1 != input!!.read(buffer).also { n = it }) {
-                    fos!!.write(buffer, 0, n)
-                }
+            val buffer = ByteArray(1024 * 4)
+            var n = 0
+            while (-1 != input!!.read(buffer).also { n = it }) {
+                fos!!.write(buffer, 0, n)
             }
         } catch (e: IOException) {
             //Log.e("errro", e.toString());
         } catch (e: NullPointerException) {
-        } catch (e: MessagingException) {
         }
         url = "file:///" + f.path
-    }
-
-    private fun htmlWrite(i: Int, s: String) {
-        var sTab = ""
-        if (i > 0) sTab = String(CharArray(i - 1)).replace("\u0000", "===")
-        try {
-            fos!!.write((Html.toHtml((SpannableString(sTab + s + "\n"))).toByteArray(Charset.forName("UTF-8"))))
-        } catch (e: IOException) {
-            //Log.e("errro", e.toString());
-        }
-    }
-
-    private fun beforeS(src: String, s: String): String {
-        return if (src.contains(s)) src.substring(0, src.indexOf(s)) else src
-    }
-
-    private fun rfcHead(message: MimeMessage, mailSession: Session) {
-        try {
-            htmlWrite(0, "$$$ : " + message.getDescription())
-            htmlWrite(0, "SUBJECT : " + message.getSubject())
-            htmlWrite(0, "FROM : " + message.getFrom().get(0))
-            htmlWrite(0, "REPLYTO : " + message.getReplyTo().get(0))
-            htmlWrite(0, "BODY : " + beforeS(message.getContentType(), ";"))
-            if (message.getContentType().startsWith("multipart")) {
-                val multiPart: Multipart = message.getContent() as Multipart
-                pp(multiPart, ">> ", mailSession)
-            } else htmlWrite(0, "--------------")
-        } catch (e: IOException) {
-            //Log.e("errro", e.toString());
-        } catch (e: MessagingException) {
-        }
-    }
-
-    private fun pp(multiPart: Multipart, s: String, mailSession: Session) {
-        emlPart += 1
-        val emlTab = String(CharArray(emlPart)).replace("\u0000", s)
-        try {
-            val numberOfParts: Int = multiPart.getCount()
-            htmlWrite(0, "\n\n")
-            htmlWrite(emlPart, "$emlTab--------------MULTIPART EMAIL:Parts=$numberOfParts")
-            for (partCount in 0 until numberOfParts) {
-                val part: MimeBodyPart = multiPart.getBodyPart(partCount) as MimeBodyPart
-                htmlWrite(emlPart, "$emlTab°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°")
-                htmlWrite(emlPart, emlTab + "Part type::" + beforeS(part.getContentType(), ";"))
-                htmlWrite(emlPart, emlTab + "Part Name::" + part.getFileName())
-                htmlWrite(emlPart, emlTab + "Part Description::" + part.getDescription())
-                htmlWrite(emlPart, emlTab + "Part Disposition::" + part.getDisposition())
-                htmlWrite(emlPart, emlTab + "Part Encoding::" + part.getEncoding())
-                if (part.getContentType().startsWith("multipart")) {
-                    val sub: Multipart = part.getContent() as Multipart
-                    pp(sub, ">>>> ", mailSession)
-                } else if (part.getContentType().startsWith("message/rfc822")) {
-                    rfcHead(part.getContent() as MimeMessage, mailSession)
-                } else if (part.getContentType().startsWith("text/html")) {
-                    fos!!.write((part.getLineCount().toString() + part.getContent().toString()).toByteArray(Charset.forName("UTF-8")))
-                } else if (part.getContentType().startsWith("image") && part.getEncoding() == "base64") {
-                    fos!!.write(("<img src='data:" + beforeS(part.getContentType(), ";") + ";" + part.getEncoding() + ",").toByteArray(Charset.forName("UTF-8")))
-                    val input: InputStream = part.getInputStream()
-                    val buffer = ByteArray(4096)
-                    val byteBuffer = ByteArrayOutputStream()
-                    var byteRead: Int
-                    while (input.read(buffer).also { byteRead = it } != -1) {
-                        byteBuffer.write(buffer, 0, byteRead)
-                    }
-                    fos!!.write(Base64.encodeToString(byteBuffer.toByteArray(), Base64.DEFAULT).toByteArray(Charset.forName("UTF-8")))
-                    fos!!.write("'>".toByteArray(Charset.forName("UTF-8")))
-                }
-                htmlWrite(emlPart, "...")
-            }
-        } catch (e: IOException) {
-            //Log.e("errro", e.toString());
-        } catch (e: MessagingException) {
-        }
-        htmlWrite(0, "\n\n")
-        emlPart -= 1
     }
 
     private fun mimeHead(uri: Uri?): String {

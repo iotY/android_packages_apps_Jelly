@@ -93,6 +93,7 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
     private val toolbar by lazy { findViewById<MaterialToolbar>(R.id.toolbar) }
     private val urlBarLayout by lazy { findViewById<UrlBarLayout>(R.id.urlBarLayout) }
     private val webView by lazy { findViewById<WebViewExt>(R.id.webView) }
+    private val incognitoIcon by lazy {  findViewById<View>(R.id.incognitoIcon) as ImageButton }
 
     private val fileRequest =
         registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) {
@@ -214,6 +215,8 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
 
         urlBarLayout.isIncognito = incognito
         urlBarLayout.webView = webView
+        window.navigationBarColor = UiUtils.getGray(this.resources)
+
 
         menuDialog = MenuDialog(this) { option: MenuDialog.Option ->
             val isDesktop = webView.isDesktopMode
@@ -263,7 +266,7 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
                     if (Build.VERSION.SDK_INT < 29) {
                         webView.saveWebArchive(pathSaveWebArchive() + nameSaveWebArchive())
                     } else {
-                        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                        intent.action = Intent.ACTION_CREATE_DOCUMENT
                         intent.addCategory(Intent.CATEGORY_OPENABLE)
                         intent.type = "text/mht"
                         intent.putExtra(Intent.EXTRA_TITLE, nameSaveWebArchive())
@@ -460,15 +463,13 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
     private suspend fun setAsFavorite(title: String, url: String) {
         val color = urlIcon?.takeUnless { it.isRecycled }?.let { bitmap ->
             UiUtils.getColor(bitmap, false).takeUnless { it == Color.TRANSPARENT }
-        } ?: ContextCompat.getColor(
-            this, com.google.android.material.R.color.material_dynamic_primary50
-        )
+        } ?: UiUtils.getGray(this.resources)
         withContext(Dispatchers.Default) {
             FavoriteProvider.addOrUpdateItem(contentResolver, title, url, color)
             withContext(Dispatchers.Main) {
                 Snackbar.make(
                     constraintLayout, getString(R.string.favorite_added),
-                    Snackbar.LENGTH_LONG
+                    Snackbar.LENGTH_SHORT
                 ).show()
             }
         }
@@ -609,21 +610,30 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
     }
 
     override fun onFaviconLoaded(favicon: Bitmap?) {
-        favicon?.let {
+        favicon?.let { it ->
             if (it.isRecycled) {
                 return
             }
             urlIcon = it.copy(it.config, true)
-            updateTaskDescription()
+            //updateTaskDescription()
+            val color = (urlIcon?.takeUnless { it.isRecycled }?.let { bitmap ->
+                    UiUtils.getColor(bitmap, false).takeUnless { it == Color.TRANSPARENT}
+                } ?: UiUtils.getGray(this.resources)
+            )
+
+            setTaskDescription(TaskDescription(webView.title,
+                    urlIcon,color))
+            window.statusBarColor = color
+            window.navigationBarColor = color
+            toolbar.setBackgroundColor(color)
 
             if (!incognito) {
-                val favicon1 = findViewById<View>(R.id.incognitoIcon) as ImageButton
                 if (urlIcon == null || urlIcon!!.isRecycled) {
-                    favicon1.visibility = View.GONE
+                    incognitoIcon.visibility = View.GONE
                 } else {
-                    favicon1.visibility = View.VISIBLE
-                    favicon1.setImageBitmap(urlIcon) //favicon1.setImageDrawable(RoundedBitmapDrawableFactory.create(resources,urlIcon)) //favicon1.setImageDrawable(BitmapDrawable(resources,urlIcon))
-                    favicon1.scaleType = ImageView.ScaleType.FIT_CENTER
+                    incognitoIcon.visibility = View.VISIBLE
+                    incognitoIcon.setImageBitmap(urlIcon) //incognitoIcon.setImageDrawable(RoundedBitmapDrawableFactory.create(resources,urlIcon)) //incognitoIcon.setImageDrawable(BitmapDrawable(resources,urlIcon))
+                    incognitoIcon.scaleType = ImageView.ScaleType.FIT_CENTER
                 }
 
             }
@@ -776,12 +786,12 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
         }
     }
 
-    private fun pathSaveWebArchive(): String? {
+    private fun pathSaveWebArchive(): String {
         return (getExternalFilesDir(null).toString() //not working gradle: targetSdkVersion 30
                 + File.separator)
     }
 
-    private fun nameSaveWebArchive(): String? {
+    private fun nameSaveWebArchive(): String {
         return (webView.title!!.replace("[^a-zA-Z0-9\\-]".toRegex(), "_")
                 + ".mht")
     }

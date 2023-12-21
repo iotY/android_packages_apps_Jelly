@@ -231,6 +231,8 @@
     <string name="pref_adblocker_title">Adblocker</string>
     <!-- Settings: adblocker summary -->
     <string name="pref_adblocker_summary">Block advertisements while browsing</string>
+    <!-- Settings: adblocker summary -->
+    <string name="pref_urlbar_summary">Search bar url vs title</string>
     <!-- Save mht -->
     <string name="save_url_mht">Save url to .mht</string>
 

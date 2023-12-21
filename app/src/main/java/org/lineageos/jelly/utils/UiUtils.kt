@@ -5,6 +5,7 @@
 
 package org.lineageos.jelly.utils
 
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -29,6 +30,15 @@ object UiUtils {
         val hsl = FloatArray(3)
         ColorUtils.RGBToHSL(red, green, blue, hsl)
         return hsl[2] > 0.5f
+    }
+
+    fun getGray(resources: Resources?): Int {
+        when (resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+            Configuration.UI_MODE_NIGHT_YES -> return Color.GRAY
+            Configuration.UI_MODE_NIGHT_NO -> return Color.LTGRAY
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> return Color.LTGRAY
+        }
+        return Color.LTGRAY
     }
 
     fun getColor(bitmap: Bitmap, incognito: Boolean): Int {

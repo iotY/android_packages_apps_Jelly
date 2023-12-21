@@ -21,6 +21,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
 import androidx.core.content.ContextCompat.startActivity
@@ -32,6 +33,7 @@ import org.lineageos.jelly.R
 import org.lineageos.jelly.SettingsActivity
 import org.lineageos.jelly.ext.requireActivity
 import org.lineageos.jelly.suggestions.SuggestionsAdapter
+import org.lineageos.jelly.utils.SharedPreferencesExt
 import org.lineageos.jelly.utils.UiUtils
 import kotlin.reflect.safeCast
 
@@ -55,6 +57,10 @@ class UrlBarLayout @JvmOverloads constructor(
     private val secureButton by lazy { findViewById<ImageButton>(R.id.secureButton) }
     private val urlBarLayoutGroupSearch by lazy { findViewById<Group>(R.id.urlBarLayoutGroupSearch) }
     private val urlBarLayoutGroupUrl by lazy { findViewById<Group>(R.id.urlBarLayoutGroupUrl) }
+
+    private val intentSettings by lazy {Intent(context, SettingsActivity::class.java)}
+    private val sharedPreferencesExt by lazy { SharedPreferencesExt(context) }
+    private val dialog by lazy { AlertDialog.Builder(context) }
 
     enum class UrlBarMode {
         URL,
@@ -97,13 +103,31 @@ class UrlBarLayout @JvmOverloads constructor(
             field = value
 
             autoCompleteTextView.setText(value)
-            secureButton.isVisible = value?.startsWith("https://") == true
+            when (value?.subSequence(0 ,8)) {
+                "file:///" -> {
+                    secureButton.isVisible = true
+                    secureButton.setImageResource(R.drawable.ic_save)
+                    if (!isIncognito) incognitoIcon.setImageResource(R.drawable.ic_launcher_monochrome)
+                }
+                "content:" -> {
+                    secureButton.isVisible = true
+                    secureButton.setImageResource(R.drawable.ic_save)
+                    if (!isIncognito) incognitoIcon.setImageResource(R.drawable.ic_launcher_monochrome)
+                }
+                "https://" -> {
+                secureButton.isVisible = true
+                secureButton.setImageResource(R.drawable.ic_lock)
+                }
+                else -> secureButton.isVisible =false
+            }
         }
 
-    var webView: WebView? = null
+    var title: String? = null
         set(value) {
             field = value
+            autoCompleteTextView.setText(value)
         }
+    var webView: WebView? = null
 
     private var certificate: SslCertificate? = null
 
@@ -169,6 +193,8 @@ class UrlBarLayout @JvmOverloads constructor(
 
         autoCompleteTextView.setOnFocusChangeListener { view, hasFocus ->
             onFocusChange(view, hasFocus)
+            autoCompleteTextView.setText(if (sharedPreferencesExt.urlBarSearch) url
+            else title)
         }
         autoCompleteTextView.setAdapter(suggestionsAdapter)
         autoCompleteTextView.setOnEditorActionListener { _, actionId: Int, _ ->
@@ -209,7 +235,14 @@ class UrlBarLayout @JvmOverloads constructor(
 
         // Set secure button callback
         secureButton.setOnClickListener {
-            certificate?.let { cert ->
+            if (certificate == null) {
+                dialog.setTitle("URL")
+                    .setMessage(url.toString())
+                    .setCancelable(true)
+                    .create()
+                    .show()
+            }
+            else certificate?.let { cert ->
                 url?.let {url ->
                     sslCertificateInfoDialog.setUrlAndCertificate(url, cert)
                     sslCertificateInfoDialog.show()
@@ -227,7 +260,7 @@ class UrlBarLayout @JvmOverloads constructor(
         }
         // Set FAVICON button LONG callback
         secureButton.setOnLongClickListener {
-            startActivity(context,Intent(context, SettingsActivity::class.java), null)
+            startActivity(context,intentSettings, null)
             true
         }
 

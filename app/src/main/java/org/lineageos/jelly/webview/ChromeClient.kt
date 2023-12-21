@@ -36,6 +36,7 @@ internal class ChromeClient(
             if (!incognito) {
                 HistoryProvider.addOrUpdateItem(activity.contentResolver, title, it)
             }
+            urlBarLayout.title=title
         }
     }
 

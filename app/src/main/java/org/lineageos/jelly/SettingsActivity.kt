@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.webkit.CookieManager
+import android.webkit.WebSettings
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -74,11 +75,30 @@ class SettingsActivity : AppCompatActivity() {
             findPreference<Preference>("key_home_page")?.let {
                 bindPreferenceSummaryToValue(it, sharedPreferencesExt.defaultHomePage)
             }
+            findPreference<Preference>("key_force_dark")?.let {
+                val vWebview = userWeb(WebSettings.getDefaultUserAgent(context))
+                if (vWebview.toInt() >= 76) {
+                    it.summary = context?.getString(R.string.pref_force_dark_summary ,vWebview)
+                } else preferenceScreen.removePreference(it)
+            }
+            /*
+            val uiModeManager: UiModeManager? = requireActivity().getSystemService(Context.UI_MODE_SERVICE) as UiModeManager?
+            if (uiModeManager!!.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION) {
             if (resources.getBoolean(R.bool.is_tablet)) {
                 findPreference<SwitchPreference>("key_reach_mode")?.let {
                     preferenceScreen.removePreference(it)
                 }
+            }*/
+        }
+        private fun userWeb(s: String): String {
+            var tmp = "0"
+            if (s.indexOf("Chrome/") > 0) {
+                tmp = s.substring(s.indexOf("Chrome/")+7)
+                if (s.indexOf(".") > 0) {
+                    tmp = tmp.substring(0, tmp.indexOf("."))
+                }
             }
+            return tmp
         }
 
         private fun bindPreferenceSummaryToValue(preference: Preference, def: String) {

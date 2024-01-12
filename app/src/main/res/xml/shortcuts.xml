@@ -62,8 +62,8 @@
         android:enabled="true"
         android:icon="@drawable/ic_menu_kill_all"
         android:shortcutDisabledMessage="@string/shortcut_disabled"
-        android:shortcutLongLabel="@string/kill_all"
-        android:shortcutShortLabel="@string/kill_all">
+        android:shortcutLongLabel="@string/menu_kill_all"
+        android:shortcutShortLabel="@string/menu_kill_all">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="org.lineageos.jelly.dev"

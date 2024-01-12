@@ -30,6 +30,7 @@ import android.os.ResultReceiver
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.text.TextUtils
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -57,6 +58,8 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.view.updateLayoutParams
 import androidx.preference.PreferenceManager
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -316,6 +319,14 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
         webView.settings.allowFileAccess = true
         webView.settings.cacheMode = WebSettings.LOAD_NORMAL
         webView.settings.allowUniversalAccessFromFileURLs = true
+
+        /*if(WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
+            //WebSettingsCompat.setAlgorithmicDarkeningAllowed(webView.settings, true)
+            //https://stackoverflow.com/questions/57449900/letting-webview-on-android-work-with-prefers-color-scheme-dark
+        }
+
+         */
+
 
         webView.loadUrl(url ?: sharedPreferencesExt.homePage)
         AdBlocker.init(this)
@@ -742,6 +753,8 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             "key_reach_mode" -> setUiMode()
+            "key_dp_toolbar" -> setUiMode()
+            "key_force_dark" -> setUiMode()
         }
     }
 
@@ -749,6 +762,12 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
         // Now you don't see it
         constraintLayout.alpha = 0f
         // Magic happens
+        toolbar.layoutParams.height = sharedPreferencesExt.dpToolbar*resources.displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT
+        if(WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+            if (sharedPreferencesExt.webForceDark) WebSettingsCompat.setForceDark(webView.settings, WebSettingsCompat.FORCE_DARK_ON)
+            else WebSettingsCompat.setForceDark(webView.settings, WebSettingsCompat.FORCE_DARK_OFF)
+        }
+
         changeUiMode(sharedPreferencesExt.reachModeEnabled)
         // Now you see it
         constraintLayout.alpha = 1f

@@ -61,6 +61,12 @@ class SharedPreferencesExt(context: Context) {
     val incognitoPolicy: Int
         get() = Integer.parseInt(sharedPreferences.getString(KEY_INCOGNITO_POLICY, "0")!!)
 
+    val dpToolbar: Int
+        get() = sharedPreferences.getInt(DP_URLBAR_KEY, 50)
+
+    val webForceDark: Boolean
+        get() = sharedPreferences.getBoolean(FORCE_DARK_KEY, false)
+
     val doNotTrackEnabled: Boolean
         get() = sharedPreferences.getBoolean(DO_NOT_TRACK_ENABLED_KEY, DO_NOT_TRACK_ENABLED_DEFAULT)
 
@@ -111,5 +117,7 @@ class SharedPreferencesExt(context: Context) {
         private const val KEY_SAVE_FORM_DATA = "key_save_form_data"
         private const val KEY_ADBLOCKER = "key_adblocker"
         private const val KEY_URLBAR = "key_urlbar"
+        private const val DP_URLBAR_KEY = "key_dp_toolbar"
+        private const val FORCE_DARK_KEY = "key_force_dark"
     }
 }

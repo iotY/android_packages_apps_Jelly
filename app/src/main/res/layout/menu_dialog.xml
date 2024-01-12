@@ -79,7 +79,7 @@
 
                     <TextView
                         style="@style/Theme.Jelly.MenuItemTitle"
-                        android:text="@string/kill_this"
+                        android:text="@string/menu_kill_this"
                         app:drawableStartCompat="@drawable/ic_menu_kill_this" />
                 </LinearLayout>
 
@@ -89,7 +89,7 @@
 
                     <TextView
                         style="@style/Theme.Jelly.MenuItemTitle"
-                        android:text="@string/kill_all"
+                        android:text="@string/menu_kill_all"
                         app:drawableStartCompat="@drawable/ic_menu_kill_all" />
                 </LinearLayout>
 
@@ -99,7 +99,7 @@
 
                     <TextView
                         style="@style/Theme.Jelly.MenuItemTitle"
-                        android:text="@string/kill_others"
+                        android:text="@string/menu_kill_others"
                         app:drawableStartCompat="@drawable/ic_menu_kill_others" />
                 </LinearLayout>
 
@@ -143,7 +143,7 @@
 
                     <TextView
                         style="@style/Theme.Jelly.MenuItemTitle"
-                        android:text="@string/save_url_mht"
+                        android:text="@string/menu_save_url_mht"
                         app:drawableStartCompat="@drawable/ic_save" />
                 </LinearLayout>
 

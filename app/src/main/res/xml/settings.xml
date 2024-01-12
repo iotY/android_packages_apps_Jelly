@@ -5,6 +5,20 @@
 -->
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <SwitchPreference
+        app:defaultValue="0"
+        app:iconSpaceReserved="false"
+        app:key="key_force_dark"
+        app:summary="Only for web content"
+        app:title="@string/pref_force_dark" />
+
+    <SwitchPreference
+        app:defaultValue="1"
+        app:iconSpaceReserved="false"
+        app:key="key_urlbar"
+        app:summary="@string/pref_urlbar_summary"
+        app:title="@string/pref_urlbar" />
+
     <ListPreference
         app:defaultValue="@string/default_search_engine"
         app:entries="@array/pref_search_engine_entries"
@@ -22,13 +36,6 @@
         app:key="key_suggestion_provider"
         app:title="@string/pref_suggestions_provider"
         app:useSimpleSummaryProvider="true" />
-
-    <SwitchPreference
-        app:defaultValue="1"
-        app:iconSpaceReserved="false"
-        app:key="key_urlbar"
-        app:summary="@string/pref_urlbar_summary"
-        app:title="@string/favorite_edit_url" />
 
     <Preference
         app:iconSpaceReserved="false"
@@ -48,6 +55,15 @@
         app:key="key_reach_mode"
         app:summary="@string/pref_reach_mode_summary"
         app:title="@string/pref_reach_mode_title" />
+
+    <SeekBarPreference
+        app:showSeekBarValue="true"
+        app:defaultValue="50"
+        app:min="30"
+        app:iconSpaceReserved="false"
+        app:key="key_dp_toolbar"
+        app:summary="Adjust urlBarHeight"
+        app:title="dpUrlBar" />
 
     <PreferenceCategory
         app:iconSpaceReserved="false"

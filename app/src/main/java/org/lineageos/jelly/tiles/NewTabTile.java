@@ -1,7 +1,6 @@
 package org.lineageos.jelly.tiles;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.service.quicksettings.TileService;
@@ -13,9 +12,6 @@ public class NewTabTile extends TileService {
 
     @Override
     public void onClick() {
-        Intent collapseIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        sendBroadcast(collapseIntent);
-        Context context = getApplicationContext();
-        MainActivity.Companion.handleShortcuts(context, "newtab");
+        startActivityAndCollapse(new Intent(getApplicationContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

@@ -24,7 +24,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetClass="org.lineageos.jelly.MainActivity"
-            android:targetPackage="org.lineageos.jelly.dev">
+            android:targetPackage="org.lineageos.jelly">
             <extra
                 android:name="extra_incognito"
                 android:value="true" />
@@ -40,7 +40,7 @@
         android:shortcutShortLabel="@string/menu_history">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="org.lineageos.jelly.dev"
+            android:targetPackage="org.lineageos.jelly"
             android:targetClass="org.lineageos.jelly.history.HistoryActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
@@ -53,7 +53,7 @@
         android:shortcutShortLabel="@string/shortcut_favorites">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="org.lineageos.jelly.dev"
+            android:targetPackage="org.lineageos.jelly"
             android:targetClass="org.lineageos.jelly.favorite.FavoriteActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
@@ -66,7 +66,7 @@
         android:shortcutShortLabel="@string/menu_kill_all">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="org.lineageos.jelly.dev"
+            android:targetPackage="org.lineageos.jelly"
             android:targetClass="org.lineageos.jelly.LaunchFileActivity" >
             <extra
                 android:name="kill_all"
@@ -83,7 +83,7 @@
         android:shortcutShortLabel="@string/menu_new_tab">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="org.lineageos.jelly.dev"
+            android:targetPackage="org.lineageos.jelly"
             android:targetClass="org.lineageos.jelly.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>

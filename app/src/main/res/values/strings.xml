@@ -4,7 +4,7 @@
      SPDX-License-Identifier: Apache-2.0
 -->
 <resources>
-    <string name="app_name">Browser</string>
+    <string name="app_name">fDROID</string>
 
     <!-- URL bar: more button -->
     <string name="url_bar_more">More</string>

@@ -180,23 +180,23 @@ class UrlBarLayout @JvmOverloads constructor(
     init {
         inflate(context, R.layout.url_bar_layout, this)
         viewTreeObserver.addOnGlobalLayoutListener(keyboardListener)
+        autoCompleteTextView.setAdapter(SuggestionsAdapter(context))
+
     }
 
     override fun onViewRemoved(view: View?) {
         viewTreeObserver.removeOnGlobalLayoutListener(keyboardListener)
     }
 
-    private val suggestionsAdapter = SuggestionsAdapter(context)
-
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
 
         autoCompleteTextView.setOnFocusChangeListener { view, hasFocus ->
-            onFocusChange(view, hasFocus)
-            autoCompleteTextView.setText(if (sharedPreferencesExt.urlBarSearch) url
-            else title)
+            autoCompleteTextView.setText(if (sharedPreferencesExt.urlBarSearch) url else title)
+            if (!hasFocus) {
+                UiUtils.hideKeyboard(requireActivity().window, view)
+            }
         }
-        autoCompleteTextView.setAdapter(suggestionsAdapter)
         autoCompleteTextView.setOnEditorActionListener { _, actionId: Int, _ ->
             when (actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {

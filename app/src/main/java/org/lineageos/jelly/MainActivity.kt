@@ -307,13 +307,13 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
             menuDialog.dismiss()
         }
         urlBarLayout.onMoreButtonClickCallback = {
-            UiUtils.hideKeyboard(window, urlBarLayout)
+            //window.currentFocus?.let { UiUtils.hideKeyboard(window, it) }
             menuDialog.showAsDropdownMenu(urlBarLayout, sharedPreferencesExt.reachModeEnabled)
         }
 
         webView.init(this, urlBarLayout, incognito)
         webView.isDesktopMode = desktopMode
-        webView.settings.domStorageEnabled = true
+        //webView.settings.domStorageEnabled = true
         webView.settings.allowContentAccess = true
         webView.settings.allowFileAccessFromFileURLs = true
         webView.settings.allowFileAccess = true
@@ -329,6 +329,7 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
 
 
         webView.loadUrl(url ?: sharedPreferencesExt.homePage)
+        webView.requestFocus()
         AdBlocker.init(this)
         setUiMode()
         try {
@@ -344,6 +345,9 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
                 when {
                     urlBarLayout.currentMode == UrlBarLayout.UrlBarMode.SEARCH -> {
                         urlBarLayout.currentMode = UrlBarLayout.UrlBarMode.URL
+                        window.currentFocus?.let { UiUtils.hideKeyboard(window, it) }
+                        window.currentFocus?.clearFocus()
+                        webView.requestFocus()
                     }
 
                     customView != null -> {

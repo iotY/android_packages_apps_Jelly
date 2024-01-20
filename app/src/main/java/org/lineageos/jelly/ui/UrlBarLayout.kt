@@ -12,11 +12,9 @@ import android.net.http.SslCertificate
 import android.os.Build
 import android.util.AttributeSet
 import android.view.KeyEvent
-import android.view.View
-import android.view.ViewTreeObserver
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.webkit.WebView
-import android.widget.AdapterView
 import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.ImageButton
@@ -24,9 +22,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.Group
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.ContextCompat.startActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.lineageos.jelly.R
@@ -36,6 +33,7 @@ import org.lineageos.jelly.suggestions.SuggestionsAdapter
 import org.lineageos.jelly.utils.SharedPreferencesExt
 import org.lineageos.jelly.utils.UiUtils
 import kotlin.reflect.safeCast
+
 
 /**
  * App's main URL and search view.
@@ -70,12 +68,22 @@ class UrlBarLayout @JvmOverloads constructor(
         set(value) {
             field = value
 
-            urlBarLayoutGroupUrl.isVisible = value == UrlBarMode.URL
-            urlBarLayoutGroupSearch.isVisible = value == UrlBarMode.SEARCH
 
             if (value == UrlBarMode.SEARCH) {
+                urlBarLayoutGroupUrl.isVisible = false
+                urlBarLayoutGroupSearch.isVisible = true
                 searchEditText.requestFocus()
+                //??//requireActivity().window.currentFocus?.let { UiUtils.showKeyboard(requireActivity().window, it) }
+                //??//UiUtils.showKeyboard(requireActivity().window, searchEditText)
+                val imm = getSystemService(context, InputMethodManager::class.java)
+                //??//imm!!.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
+                imm!!.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)//THE only1 ??
+
+            } else  {
+                urlBarLayoutGroupSearch.isVisible = false
+                urlBarLayoutGroupUrl.isVisible = true
             }
+
         }
 
     var isIncognito = false
@@ -164,38 +172,23 @@ class UrlBarLayout @JvmOverloads constructor(
         }
     }
 
-    // Listeners
-    private val keyboardListener = ViewTreeObserver.OnGlobalLayoutListener {
-        val isKeyboardOpen = ViewCompat.getRootWindowInsets(this)
-            ?.isVisible(WindowInsetsCompat.Type.ime()) ?: true
-
-        if (!isKeyboardOpen && wasKeyboardVisible) {
-            autoCompleteTextView.clearFocus()
-            searchEditText.clearFocus()
-        }
-
-        wasKeyboardVisible = isKeyboardOpen
-    }
-
     init {
         inflate(context, R.layout.url_bar_layout, this)
-        viewTreeObserver.addOnGlobalLayoutListener(keyboardListener)
         autoCompleteTextView.setAdapter(SuggestionsAdapter(context))
 
     }
 
-    override fun onViewRemoved(view: View?) {
-        viewTreeObserver.removeOnGlobalLayoutListener(keyboardListener)
-    }
-
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-
-        autoCompleteTextView.setOnFocusChangeListener { view, hasFocus ->
-            autoCompleteTextView.setText(if (sharedPreferencesExt.urlBarSearch) url else title)
+        //https://developer.android.com/develop/ui/views/layout/sw-keyboard
+        autoCompleteTextView.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
-                UiUtils.hideKeyboard(requireActivity().window, view)
-            }
+                UiUtils.hideKeyboard(requireActivity().window, autoCompleteTextView)
+                autoCompleteTextView.setText(title)
+                autoCompleteTextView.clearFocus()
+                webView?.requestFocus(FOCUS_DOWN or FOCUS_UP)
+
+            } else autoCompleteTextView.setText(if (sharedPreferencesExt.urlBarSearch) url else title)
         }
         autoCompleteTextView.setOnEditorActionListener { _, actionId: Int, _ ->
             when (actionId) {
@@ -203,6 +196,7 @@ class UrlBarLayout @JvmOverloads constructor(
                     UiUtils.hideKeyboard(requireActivity().window, autoCompleteTextView)
                     onLoadUrlCallback?.invoke(autoCompleteTextView.text.toString())
                     autoCompleteTextView.clearFocus()
+                    webView?.requestFocus(FOCUS_DOWN or FOCUS_UP)
                     true
                 }
                 else -> false
@@ -214,6 +208,7 @@ class UrlBarLayout @JvmOverloads constructor(
                     UiUtils.hideKeyboard(requireActivity().window, autoCompleteTextView)
                     onLoadUrlCallback?.invoke(autoCompleteTextView.text.toString())
                     autoCompleteTextView.clearFocus()
+                    webView?.requestFocus(FOCUS_DOWN or FOCUS_UP)
                     true
                 }
                 else -> false
@@ -225,13 +220,17 @@ class UrlBarLayout @JvmOverloads constructor(
             UiUtils.hideKeyboard(requireActivity().window, autoCompleteTextView)
             autoCompleteTextView.clearFocus()
             onLoadUrlCallback?.invoke(text)
+            webView?.requestFocus(FOCUS_DOWN or FOCUS_UP)
         }
         if (isIncognito && Build.VERSION.SDK_INT >= 26) {
             autoCompleteTextView.imeOptions = autoCompleteTextView.imeOptions or
                     EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING
         }
 
-        moreButton.setOnClickListener { onMoreButtonClickCallback?.invoke() }
+        moreButton.setOnClickListener {
+            requireActivity().window.currentFocus?.let { it1 -> UiUtils.hideKeyboard(requireActivity().window, it1) }
+            onMoreButtonClickCallback?.invoke()
+        }
 
         // Set secure button callback
         secureButton.setOnClickListener {
@@ -265,30 +264,52 @@ class UrlBarLayout @JvmOverloads constructor(
         }
 
         // Set search callbacks
-        searchEditText.setOnFocusChangeListener { view, hasFocus ->
-            onFocusChange(view, hasFocus)
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) UiUtils.hideKeyboard(requireActivity().window, searchEditText)
         }
-        searchEditText.setOnEditorActionListener { view, actionId, _ ->
+        searchEditText.setOnEditorActionListener { _, actionId, _ ->
             return@setOnEditorActionListener when(actionId) {
                 EditorInfo.IME_ACTION_SEARCH -> {
-                    UiUtils.hideKeyboard(requireActivity().window, view)
+
                     searchEditText.text?.toString()?.takeUnless { it.isEmpty() }?.also {
                         onStartSearchCallback?.invoke(it)
                     } ?: run {
                         clearSearch()
                     }
+                    UiUtils.hideKeyboard(requireActivity().window, searchEditText)
+                    searchEditText.clearFocus()
                     true
                 }
-                else -> {
-                    false
+                else -> false
+            }
+        }
+        searchEditText.setOnKeyListener { _, keyCode: Int, _ ->
+            when (keyCode) {
+                KeyEvent.KEYCODE_ENTER -> {
+                    searchEditText.text?.toString()?.takeUnless { it.isEmpty() }?.also {
+                        onStartSearchCallback?.invoke(it)
+                    } ?: run {
+                        clearSearch()
+                    }
+                    UiUtils.hideKeyboard(requireActivity().window, searchEditText)
+                    searchEditText.clearFocus()
+                    true
                 }
+                else -> false
             }
         }
         searchCancelButton.setOnClickListener {
-            currentMode = UrlBarMode.URL
             clearSearch()
+            searchEditText.clearFocus()
+            UiUtils.hideKeyboard(requireActivity().window, it)
+            webView?.requestFocus()
+            currentMode = UrlBarMode.URL
         }
-        searchClearButton.setOnClickListener { clearSearch() }
+        searchClearButton.setOnClickListener {
+            clearSearch()
+            searchEditText.requestFocus()
+            UiUtils.showKeyboard(requireActivity().window, searchEditText)
+        }
         searchPreviousButton.setOnClickListener { onSearchPositionChangeCallback?.invoke(false) }
         searchNextButton.setOnClickListener { onSearchPositionChangeCallback?.invoke(true) }
     }
@@ -308,14 +329,6 @@ class UrlBarLayout @JvmOverloads constructor(
         searchEditText.setText("")
         searchPositionInfo = EMPTY_SEARCH_RESULT
         onClearSearchCallback?.invoke()
-    }
-
-    private fun onFocusChange(view: View, hasFocus: Boolean) {
-        if (hasFocus) {
-            UiUtils.showKeyboard(requireActivity().window, view)
-        } else {
-            UiUtils.hideKeyboard(requireActivity().window, view)
-        }
     }
 
     companion object {

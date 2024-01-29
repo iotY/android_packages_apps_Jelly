@@ -8,6 +8,7 @@ package org.lineageos.jelly
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -41,6 +42,7 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
 
+        if (Build.VERSION.SDK_INT < 29) window.navigationBarColor = Color.LTGRAY
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -74,6 +76,10 @@ class SettingsActivity : AppCompatActivity() {
 
             findPreference<Preference>("key_home_page")?.let {
                 bindPreferenceSummaryToValue(it, sharedPreferencesExt.defaultHomePage)
+            }
+            findPreference<Preference>("key_urlbar")?.let {
+                it.title = context?.getString(R.string.search_bar_hint) + context?.getString(R.string.favorite_edit_positive)
+                it.summary = context?.getString(R.string.pref_urlbar_summary) + " " + context?.getString(R.string.favorite_edit_title)
             }
             findPreference<Preference>("key_force_dark")?.let {
                 val vWebview = userWeb(WebSettings.getDefaultUserAgent(context))

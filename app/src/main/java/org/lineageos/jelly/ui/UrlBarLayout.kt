@@ -82,6 +82,7 @@ class UrlBarLayout @JvmOverloads constructor(
             } else  {
                 urlBarLayoutGroupSearch.isVisible = false
                 urlBarLayoutGroupUrl.isVisible = true
+                autoCompleteTextView.setText(if (sharedPreferencesExt.urlBarSearch) url else title)
             }
 
         }
@@ -184,7 +185,7 @@ class UrlBarLayout @JvmOverloads constructor(
         autoCompleteTextView.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 UiUtils.hideKeyboard(requireActivity().window, autoCompleteTextView)
-                autoCompleteTextView.setText(title)
+                autoCompleteTextView.setText(if (sharedPreferencesExt.urlBarSearch) url else title)
                 autoCompleteTextView.clearFocus()
                 webView?.requestFocus(FOCUS_DOWN or FOCUS_UP)
 
@@ -323,6 +324,7 @@ class UrlBarLayout @JvmOverloads constructor(
     fun onPageLoadFinished(certificate: SslCertificate?) {
         this.certificate = certificate
         isLoading = false
+        autoCompleteTextView.setText(if (sharedPreferencesExt.urlBarSearch) url else title)
     }
 
     private fun clearSearch() {

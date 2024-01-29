@@ -231,8 +231,8 @@
     <string name="menu_kill_this">Close_this</string>
 
     <string name="pref_force_dark">Night Mode</string>
-    <string name="pref_force_dark_summary">WebView v%1$s: NightMode only force inside web to dark</string>
-    <string name="pref_urlbar_summary">url VS title (when SearchBar)</string>
+    <string name="pref_force_dark_summary">WebView = v%1$s: NightMode only force inside web to dark</string>
+    <string name="pref_urlbar_summary">URL vs </string>
     <string name="pref_urlbar">SearchBar context</string>
     <!-- Save mht -->
     <string name="menu_save_url_mht">Save url to .mht</string>

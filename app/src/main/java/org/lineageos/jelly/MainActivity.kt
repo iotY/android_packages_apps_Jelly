@@ -759,6 +759,7 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
             "key_reach_mode" -> setUiMode()
             "key_dp_toolbar" -> setUiMode()
             "key_force_dark" -> setUiMode()
+            "key_urlbar" -> setUiMode()
         }
     }
 
@@ -771,7 +772,7 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
             if (sharedPreferencesExt.webForceDark) WebSettingsCompat.setForceDark(webView.settings, WebSettingsCompat.FORCE_DARK_ON)
             else WebSettingsCompat.setForceDark(webView.settings, WebSettingsCompat.FORCE_DARK_OFF)
         }
-
+        urlBarLayout.currentMode =  UrlBarLayout.UrlBarMode.URL
         changeUiMode(sharedPreferencesExt.reachModeEnabled)
         // Now you see it
         constraintLayout.alpha = 1f

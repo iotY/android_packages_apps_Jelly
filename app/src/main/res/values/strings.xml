@@ -237,4 +237,8 @@
     <!-- Save mht -->
     <string name="menu_save_url_mht">Save url to .mht</string>
 
+    <string name="ssl_x509">\u2B04 x509 \u27A0\u27A0\u27A0\u27A0\u27A0</string>
+    <string name="virustotal"><b>+<u>VirusTotal ?</u></b></string>
+    <string name="mywot"><a href="https://www.mywot.com/scorecard/%1$s"> MyWOT </a></string>
+
 </resources>

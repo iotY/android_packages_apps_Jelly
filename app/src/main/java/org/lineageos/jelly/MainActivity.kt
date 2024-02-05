@@ -47,7 +47,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -166,26 +165,21 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
         }
     }
 
-    private val startForResultSaveArchive = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val uri: Uri = result.data!!.data!!
-            webView.saveWebArchive(pathSaveWebArchive() + nameSaveWebArchive(), false) { s: String? ->
-                if (s != null) {
-                    try {
-                        //val input: InputStream = BufferedInputStream(FileInputStream(File(s).absoluteFile) as InputStream?)
-                        val pfd = baseContext.contentResolver.openFileDescriptor(uri, "w")
-                        BufferedInputStream(FileInputStream(File(s).absoluteFile)).use { stream ->
-                            stream.copyTo(FileOutputStream(pfd!!.fileDescriptor))
-                            //stream.copyTo(FileOutputStream(File(uri.getPath()!!)))
-                        }
-                        pfd!!.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
+    private val startForResultSaveArchive = registerForActivityResult(ActivityResultContracts.CreateDocument("text/mht")) { uri  ->
+        webView.saveWebArchive(pathSaveWebArchive() + nameSaveWebArchive(), false) { s: String? ->
+            if (s != null) {
+                //Toast.makeText(this, "\u2707" + getExternalFilesDir(null), Toast.LENGTH_LONG).show()
+                if (uri != null) BufferedInputStream(FileInputStream(File(s).absoluteFile)).use { stream ->
+                    stream.copyTo(FileOutputStream(baseContext.contentResolver.openFileDescriptor(uri, "w")!!.fileDescriptor))
                 }
-            }
-            // Perform operations on the document using its URI.
-        } else webView.saveWebArchive(pathSaveWebArchive() + nameSaveWebArchive())
+                addShortcut("\u2707" + webView.title, "file:///" + pathSaveWebArchive() + nameSaveWebArchive())
+                uiScope.launch {
+                    setAsFavorite("\u2707" + webView.title, pathSaveWebArchive() + nameSaveWebArchive())
+                }
+            } else Toast.makeText(this, getString(R.string.permission_error_title)
+                    + " "
+                    + getExternalFilesDir(null), Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -266,21 +260,7 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
                 }
                 MenuDialog.Option.SETTINGS -> startActivity(Intent(this, SettingsActivity::class.java))
                 MenuDialog.Option.SAVE -> {
-                    if (Build.VERSION.SDK_INT < 29) {
-                        webView.saveWebArchive(pathSaveWebArchive() + nameSaveWebArchive())
-                    } else {
-                        intent.action = Intent.ACTION_CREATE_DOCUMENT
-                        intent.addCategory(Intent.CATEGORY_OPENABLE)
-                        intent.type = "text/mht"
-                        intent.putExtra(Intent.EXTRA_TITLE, nameSaveWebArchive())
-                        startForResultSaveArchive.launch(intent)
-                    }
-                    addShortcut("\u2707" + webView.title, "file:///" + pathSaveWebArchive() + nameSaveWebArchive())
-                    uiScope.launch {
-                        setAsFavorite("\u2707" + webView.title, pathSaveWebArchive() + nameSaveWebArchive())
-                    }
-                    Toast.makeText(this, "\u2707" + getExternalFilesDir(null), Toast.LENGTH_LONG).show()
-
+                    startForResultSaveArchive.launch(nameSaveWebArchive())
                 }
 
                 else -> {

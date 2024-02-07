@@ -17,7 +17,7 @@ chosen one (via /Settings/) triggered, from any selected text (anywhere via long
 
 ## AOSP compilation: ***packages/apps/Quarks/***
 ```
-use branch -b fdroid21 (org.lineageos.jelly 21.0+)
+use branch -b aosp (org.lineageos.jelly 21.0+)
 ```
 
 ```

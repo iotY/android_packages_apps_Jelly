@@ -97,14 +97,42 @@
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:background="@android:color/darker_gray"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
             <!-- Issued By -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/ssl_cert_dialog_issued_by"
                 android:textAllCaps="true"
                 android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/mywot"
+                android:layout_width="0dp"
+                android:layout_height="25dp"
+                android:layout_gravity="end"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:insetTop="2dp"
+                android:insetBottom="0dp"
+                android:text="@string/mywot"
+                android:textColor="#FF6750a4"
+                android:backgroundTint="@color/lb_grey"
+                android:textSize="12dp"
+                android:padding="0dp"
+                app:cardCornerRadius="0dp"
+                app:rippleColor="@color/material_on_primary_emphasis_high_type"
+                app:shapeAppearance="@color/cardview_light_background"
+                android:background="?selectableItemBackgroundBorderless"
+                />
+
+        </LinearLayout>
 
             <org.lineageos.jelly.ui.KeyValueView
                 android:id="@+id/issuedByCnView"

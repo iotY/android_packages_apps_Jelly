@@ -33,6 +33,7 @@ class SslCertificateInfoDialog(
     private val dismissButton by lazy { findViewById<Button>(R.id.dismissButton) }
     private val pingButton by lazy { findViewById<Button>(R.id.ping) }
     private val virusTotalButton by lazy { findViewById<Button>(R.id.virustotal) }
+    private val mmyWotButton by lazy { findViewById<Button>(R.id.mywot) }
     private var domain = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +50,9 @@ class SslCertificateInfoDialog(
         }
         virusTotalButton.setOnClickListener {
             TabUtils.openInNewTab(context, "https://www.virustotal.com/gui/domain/$domain/summary", false)
-            //TabUtils.openInNewTab(context, "https://www.mywot.com/scorecard/$domain", false)
+        }
+        mmyWotButton.setOnClickListener {
+            TabUtils.openInNewTab(context, "https://www.mywot.com/scorecard/$domain", false)
         }
         dismissButton.setOnClickListener {
             dismiss()

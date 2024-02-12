@@ -13,6 +13,7 @@ import android.net.Uri
 import android.net.http.SslCertificate
 import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.UiContext
@@ -64,7 +65,7 @@ class SslCertificateInfoDialog(
     ) {
         // Get the domain name
         domain = Uri.parse(url).host!!
-        val nn = System.getProperty("line.separator")
+        val nn = "<br>"//System.getProperty("line.separator")
 
         // Get the validity dates
         val startDate = certificate.validNotBeforeDate
@@ -72,17 +73,16 @@ class SslCertificateInfoDialog(
 
         // Update TextViews
         urlView.text = url// Runtime.getRuntime().exec("ping -w 1 "+ domain).inputStream.bufferedReader().use(BufferedReader::readText)
-        domainView.text = (buildString {
-            append(context.getString(R.string.ssl_cert_dialog_domain).uppercase() + nn)
-            append(domain + nn )
-            // ping -w 1 Uri.parse(url).host
+        domainView.text = (Html.fromHtml(buildString {
+            append("<b>" + context.getString(R.string.ssl_cert_dialog_domain) + ":</b>")
+            append(domain + nn)
             append(certificate.toString() + nn)
-            append(context.getString(R.string.ssl_cert_dialog_validity).uppercase() + nn)
-            append("<<" + context.getString(R.string.ssl_cert_dialog_issued_on) + nn)
+            append("\t<b>" + context.getString(R.string.ssl_cert_dialog_validity).uppercase() + "</b>" +  nn)
+            append("<b>" + context.getString(R.string.ssl_cert_dialog_issued_on) + "</b>" +  nn)
             append(DateFormat.getDateTimeInstance().format(startDate) + nn)
-            append(">>" + context.getString(R.string.ssl_cert_dialog_expires_on) + nn)
+            append("<b>" + context.getString(R.string.ssl_cert_dialog_expires_on) + "</b>" +  nn)
             append(DateFormat.getDateTimeInstance().format(endDate))
-        })
+        }))
 
         issuedByCNView.setText(
             R.string.ssl_cert_dialog_common_name,

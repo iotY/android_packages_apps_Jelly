@@ -234,6 +234,10 @@
     <string name="pref_force_dark_summary">WebView = v%1$s: NightMode only force inside web to dark</string>
     <string name="pref_urlbar_summary">URL vs </string>
     <string name="pref_urlbar">SearchBar context</string>
+    <string name="pref_about">jQuarks \u261e \u2139 : this webview-based browser is optimised for day to day throwable internet browsing with standard protection and a basic AdBlocker.
+        \n\nIf your on-board android webview is officially SIGNED by Google and up-to-date, jQuarks can then be used for commercial accounts like Youtube or others who will always(?) resell your navigation, whatever the browser …
+        \n\nUse Firefox/Android with Mozilla embedded web-rendering Gecko (or Fennec/Fdroid) for yours tactical accounts like banking-operations, tax-recoveries, health-care and others, when advanced online protection is needed with safe partners.
+        \n\nUse TorBrowser when anonymous untraceable connections are required.</string>
     <!-- Save mht -->
     <string name="menu_save_url_mht">Save url to .mht</string>
 

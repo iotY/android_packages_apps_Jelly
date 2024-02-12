@@ -125,4 +125,32 @@
             app:key="key_cookie_clear"
             app:title="@string/pref_cookie_clear" />
     </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="true"
+        app:icon="@mipmap/ic_launcher_round"
+        app:key="key_about_resume"
+        app:title="About">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="key_about_notice"/>
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="key_about_useragent"
+            app:summary="WebView"
+            app:title="UserAgent" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="key_about_whatsnew"
+            app:summary="What's new"
+            app:title="jQuarks version" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="key_about_jquarks"
+            app:title="@string/pref_about" />
+    </PreferenceCategory>
 </PreferenceScreen>

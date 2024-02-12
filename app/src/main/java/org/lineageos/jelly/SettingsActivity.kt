@@ -10,12 +10,14 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
+import android.text.util.Linkify
 import android.view.MenuItem
 import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -24,8 +26,8 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import androidx.preference.SwitchPreference
 import org.lineageos.jelly.utils.SharedPreferencesExt
+import java.util.Date
 import kotlin.reflect.safeCast
 
 class SettingsActivity : AppCompatActivity() {
@@ -73,6 +75,7 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstance: Bundle?, rootKey: String?) {
             // Load the preferences from an XML resource
             setPreferencesFromResource(R.xml.settings, rootKey)
+            val vWebview = userWeb(WebSettings.getDefaultUserAgent(context))
 
             findPreference<Preference>("key_home_page")?.let {
                 bindPreferenceSummaryToValue(it, sharedPreferencesExt.defaultHomePage)
@@ -82,10 +85,26 @@ class SettingsActivity : AppCompatActivity() {
                 it.summary = context?.getString(R.string.pref_urlbar_summary) + " " + context?.getString(R.string.favorite_edit_title)
             }
             findPreference<Preference>("key_force_dark")?.let {
-                val vWebview = userWeb(WebSettings.getDefaultUserAgent(context))
                 if (vWebview.toInt() >= 76) {
                     it.summary = context?.getString(R.string.pref_force_dark_summary ,vWebview)
                 } else preferenceScreen.removePreference(it)
+            }
+            findPreference<Preference>("key_about_notice")?.let {
+                it.title = "Notice: " + "(" + BuildConfig.BUILD_TYPE + ")"
+                it.summary =  Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.firstInstallTime!!).toString()
+            }
+            findPreference<Preference>("key_about_useragent")?.let {
+                it.title = "android WebView version = $vWebview"
+                it.summary = "UserAgent fingerprint"
+            }
+            findPreference<Preference>("key_about_resume")?.let {
+                it.title = "About: " + BuildConfig.APPLICATION_ID
+                //it.summary =
+            }
+            findPreference<Preference>("key_about_whatsnew")?.let {
+                it.title = "What's new in: jQuarks v" + BuildConfig.VERSION_NAME
+                it.summary = Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.lastUpdateTime!!).toString() +
+                        "\n\u3004" + context?.packageManager?.getInstallerPackageName(BuildConfig.APPLICATION_ID)
             }
             /*
             val uiModeManager: UiModeManager? = requireActivity().getSystemService(Context.UI_MODE_SERVICE) as UiModeManager?
@@ -105,6 +124,22 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }
             return tmp
+        }
+
+        private fun showZinfo(s: String, t: String, linky: Boolean) {
+            val showText = TextView(context)
+            showText.text = s
+            showText.setTextIsSelectable(true)
+            if (linky) {
+                showText.autoLinkMask = Linkify.ALL
+                Linkify.addLinks(showText, Linkify.WEB_URLS)
+            }
+            val builder = android.app.AlertDialog.Builder(context, android.R.style.ThemeOverlay_Material_Dialog_Alert)
+            builder.setView(showText)
+                    .setTitle(t)
+                    .setCancelable(true)
+                    .setNegativeButton(android.R.string.ok, null)
+                    .show()
         }
 
         private fun bindPreferenceSummaryToValue(preference: Preference, def: String) {
@@ -136,6 +171,26 @@ class SettingsActivity : AppCompatActivity() {
             return when (preference.key) {
                 "key_home_page" -> {
                     editHomePage(preference)
+                    true
+                }
+                "key_about_notice" -> {
+                    showZinfo(this.resources.openRawResource(R.raw.full_description).bufferedReader().use { it1 -> it1.readText() } +
+                            "\n" + context?.getString(R.string.pref_about)
+                            , "Notice"
+                            , true)
+                    true
+                }
+                "key_about_whatsnew" -> {
+                    showZinfo(this.resources.openRawResource(R.raw.whatsnew).bufferedReader().use { it1 -> it1.readText() } +
+                            "\n" + context?.getString(R.string.pref_about)
+                            , "Whats's new"
+                            , true)
+                    true
+                }
+                "key_about_useragent" -> {
+                    showZinfo(WebSettings.getDefaultUserAgent(context)
+                            , "UserAgent"
+                            , true)
                     true
                 }
                 "key_cookie_clear" -> {

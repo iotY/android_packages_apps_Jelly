@@ -299,6 +299,7 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
         webView.settings.allowFileAccess = true
         webView.settings.cacheMode = WebSettings.LOAD_NORMAL
         webView.settings.allowUniversalAccessFromFileURLs = true
+        webView.settings.userAgentString = UiUtils.fakeUserAgent(this, true, sharedPreferencesExt.randomUserAgent)
 
         /*if(WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING)) {
             //WebSettingsCompat.setAlgorithmicDarkeningAllowed(webView.settings, true)
@@ -740,6 +741,8 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
             "key_dp_toolbar" -> setUiMode()
             "key_force_dark" -> setUiMode()
             "key_urlbar" -> setUiMode()
+            "key_random_useragent" -> webView.settings.userAgentString = UiUtils.fakeUserAgent(this, true, sharedPreferencesExt.randomUserAgent)
+
         }
     }
 

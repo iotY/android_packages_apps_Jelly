@@ -1,3 +1,4 @@
+ - randomized UserAgent for each tab
  - pageIcon in urlBar: click to Refresh & longclick for GoForward
  - secureIcon in urlBar: click to sslCertificate & longclick to /Settings
  - ping action, x509 and links to VirusTotal/MyWOT via sslCertificate screen
@@ -7,13 +8,14 @@
  - Ads_Blocker list updated
  - update translations
  - SDK up to 32: android 12 (Snowcone)
-
+ 
 (Apache License v2.0 https://github.com/iotY/android_packages_apps_Jelly/tree/fdroid21)
 
 ...
- - Offline save to .mht format in
+ - Offline save to .mht format in 
  - Share content: for mp4/html/mht/xml/svg/eml & any text files.
  - wip : .eml viewer
 
 ...
  - android TV menu compatibility (+ w.i.p. samsung Dex)
+ 

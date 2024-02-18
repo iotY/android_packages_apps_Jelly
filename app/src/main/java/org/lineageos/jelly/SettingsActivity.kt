@@ -27,6 +27,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import org.lineageos.jelly.utils.SharedPreferencesExt
+import org.lineageos.jelly.utils.UiUtils
 import java.util.Date
 import kotlin.reflect.safeCast
 
@@ -75,7 +76,7 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstance: Bundle?, rootKey: String?) {
             // Load the preferences from an XML resource
             setPreferencesFromResource(R.xml.settings, rootKey)
-            val vWebview = userWeb(WebSettings.getDefaultUserAgent(context))
+            val vWebview = UiUtils.userWeb(WebSettings.getDefaultUserAgent(context))
 
             findPreference<Preference>("key_home_page")?.let {
                 bindPreferenceSummaryToValue(it, sharedPreferencesExt.defaultHomePage)
@@ -87,24 +88,28 @@ class SettingsActivity : AppCompatActivity() {
             findPreference<Preference>("key_force_dark")?.let {
                 if (vWebview.toInt() >= 76) {
                     it.summary = context?.getString(R.string.pref_force_dark_summary ,vWebview)
-                } else preferenceScreen.removePreference(it)
+                } else {
+                    it.summary = context?.getString(R.string.pref_force_dark_summary_disabled ,vWebview)
+                    it.isEnabled= false
+                }
             }
             findPreference<Preference>("key_about_notice")?.let {
                 it.title = "Notice: " + "(" + BuildConfig.BUILD_TYPE + ")"
-                it.summary =  Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.firstInstallTime!!).toString()
+                it.summary =  "Installed since: " + Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.firstInstallTime!!).toString()
             }
             findPreference<Preference>("key_about_useragent")?.let {
-                it.title = "android WebView version = $vWebview"
-                it.summary = "UserAgent fingerprint"
+                it.title = "UserAgent: WebView v$vWebview"
+                it.summary = UiUtils.fakeUserAgent(requireContext(), false, sharedPreferencesExt.randomUserAgent)
             }
             findPreference<Preference>("key_about_resume")?.let {
                 it.title = "About: " + BuildConfig.APPLICATION_ID
                 //it.summary =
             }
             findPreference<Preference>("key_about_whatsnew")?.let {
+                val tmp = context?.packageManager?.getInstallerPackageName(BuildConfig.APPLICATION_ID)
                 it.title = "What's new in: jQuarks v" + BuildConfig.VERSION_NAME
-                it.summary = Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.lastUpdateTime!!).toString() +
-                        "\n\u3004" + context?.packageManager?.getInstallerPackageName(BuildConfig.APPLICATION_ID)
+                it.summary = "Updated: " + Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.lastUpdateTime!!).toString() +
+                        if (tmp!= null) "\n\u3004" + tmp else ""
             }
             /*
             val uiModeManager: UiModeManager? = requireActivity().getSystemService(Context.UI_MODE_SERVICE) as UiModeManager?
@@ -115,17 +120,6 @@ class SettingsActivity : AppCompatActivity() {
                 }
             }*/
         }
-        private fun userWeb(s: String): String {
-            var tmp = "0"
-            if (s.indexOf("Chrome/") > 0) {
-                tmp = s.substring(s.indexOf("Chrome/")+7)
-                if (s.indexOf(".") > 0) {
-                    tmp = tmp.substring(0, tmp.indexOf("."))
-                }
-            }
-            return tmp
-        }
-
         private fun showZinfo(s: String, t: String, linky: Boolean) {
             val showText = TextView(context)
             showText.text = s
@@ -138,7 +132,7 @@ class SettingsActivity : AppCompatActivity() {
             builder.setView(showText)
                     .setTitle(t)
                     .setCancelable(true)
-                    .setNegativeButton(android.R.string.ok, null)
+                    .setNegativeButton(getString(R.string.dismiss), null)
                     .show()
         }
 
@@ -188,16 +182,43 @@ class SettingsActivity : AppCompatActivity() {
                     true
                 }
                 "key_about_useragent" -> {
-                    showZinfo(WebSettings.getDefaultUserAgent(context)
-                            , "UserAgent"
+                    showZinfo(WebSettings.getDefaultUserAgent(context) //+ "\n\n" + System.getProperty("http.agent")
+                            , "device UserAgent"
+                            , true)
+                    true
+                }
+                "key_about_jquarks" -> {
+                    showZinfo(context?.getString(R.string.menu_in_new_tab) +" https://coveryourtracks.eff.org/kcarter?aat=1" +
+                            "\n\n" + "Fennec/F-droid: https://f-droid.org/packages/org.mozilla.fennec_fdroid/" +
+                            "\n" + "TorBrowser: https://tb-manual.torproject.org/mobile-tor/"
+                            ,  "Test jQuarks ☞ ℹ"
                             , true)
                     true
                 }
                 "key_cookie_clear" -> {
-                    CookieManager.getInstance().removeAllCookies(null)
+                    val builder = android.app.AlertDialog.Builder(context, android.R.style.ThemeOverlay_Material_Dialog_Alert)
+                    builder.setTitle(getString(R.string.pref_cookie_clear))
+                            .setCancelable(true)
+                            .setPositiveButton(
+                                    android.R.string.ok
+                            ) { _: DialogInterface?, _: Int ->
+                                CookieManager.getInstance().removeAllCookies(null)
+                                Toast.makeText(
+                                        preference.context, getString(R.string.pref_cookie_clear_done),
+                                        Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            .setNegativeButton(android.R.string.cancel, null)
+                            .show()
+                    true
+                }
+                "key_random_useragent" -> {
+                    findPreference<Preference>("key_about_useragent")?.let {
+                        it.summary = UiUtils.fakeUserAgent(requireContext(), false, sharedPreferencesExt.randomUserAgent)
+                    }
                     Toast.makeText(
-                        preference.context, getString(R.string.pref_cookie_clear_done),
-                        Toast.LENGTH_LONG
+                            preference.context, getString(R.string.menu_refresh) + " ??\n" + getString(R.string.pref_random_useragent_caution),
+                            Toast.LENGTH_SHORT
                     ).show()
                     true
                 }

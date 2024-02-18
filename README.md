@@ -1,7 +1,6 @@
 # (Kotlin)Quarks Browser refactored ***org.lineageos.jelly*** for AOSP compilation
-Jelly browser with ads blocker, a few ui changes and some bug fixes.
+Jelly browser with ads blocker, support for android 6.0+, a few ui changes and some bug fixes.
 Ads blocker and favicon in search bar based on this: https://github.com/CarbonROM/android_packages_apps_Quarks
-
 
 ### Ads blocker:
  * https://pgl.yoyo.org/as/serverlist.php?hostformat=nohtml&showintro=0
@@ -14,6 +13,7 @@ Ads blocker and favicon in search bar based on this: https://github.com/CarbonRO
  
 ### tab(s) manager:
  * tile & iconShortcut for allTabs kill
+ * randomized UserAgent for each tab
  
 ### external launches:
  * local xml/mht/html/svg/eml, for both ^content^ (X-plore) & ^file^ (aosp/Files or GhostCommander)

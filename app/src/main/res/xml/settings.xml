@@ -111,6 +111,13 @@
             app:title="@string/pref_do_not_track_title" />
 
         <SwitchPreference
+            app:defaultValue="0"
+            app:iconSpaceReserved="false"
+            app:key="key_random_useragent"
+            app:summary="@string/pref_random_useragent_summary"
+            app:title="@string/pref_random_useragent" />
+
+        <SwitchPreference
             app:defaultValue="1"
             app:iconSpaceReserved="false"
             app:key="key_cookie"

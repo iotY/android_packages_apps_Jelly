@@ -16,8 +16,7 @@
         app:defaultValue="1"
         app:iconSpaceReserved="false"
         app:key="key_urlbar"
-        app:summary="@string/pref_urlbar_summary"
-        app:title="@string/pref_urlbar" />
+        app:summary="@string/pref_urlbar_summary" />
 
     <ListPreference
         app:defaultValue="@string/default_search_engine"
@@ -164,6 +163,6 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="key_about_jquarks"
-            app:title="@string/pref_about" />
+            app:title="@string/pref_context" />
     </PreferenceCategory>
 </PreferenceScreen>

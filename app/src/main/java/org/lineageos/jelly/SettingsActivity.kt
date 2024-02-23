@@ -89,26 +89,27 @@ class SettingsActivity : AppCompatActivity() {
                 if (vWebview.toInt() >= 76) {
                     it.summary = context?.getString(R.string.pref_force_dark_summary ,vWebview)
                 } else {
-                    it.summary = context?.getString(R.string.pref_force_dark_summary_disabled ,vWebview)
+                    it.title = context?.getString(R.string.pref_force_dark) + ": WebView = " + vWebview
+                    it.summary = context?.getString(R.string.pref_notice) + context?.getString(R.string.pref_updated) + " >=76"
                     it.isEnabled= false
                 }
             }
             findPreference<Preference>("key_about_notice")?.let {
-                it.title = "Notice: " + "(" + BuildConfig.BUILD_TYPE + ")"
-                it.summary =  "Installed since: " + Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.firstInstallTime!!).toString()
+                it.title = context?.getString(R.string.pref_notice) + "(" + BuildConfig.BUILD_TYPE + ")"
+                it.summary =  context?.getString(R.string.pref_first_installed) + Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.firstInstallTime!!).toString()
             }
             findPreference<Preference>("key_about_useragent")?.let {
                 it.title = "UserAgent: WebView v$vWebview"
                 it.summary = UiUtils.fakeUserAgent(requireContext(), false, sharedPreferencesExt.randomUserAgent)
             }
             findPreference<Preference>("key_about_resume")?.let {
-                it.title = "About: " + BuildConfig.APPLICATION_ID
+                it.title = context?.getString(R.string.pref_about) + BuildConfig.APPLICATION_ID
                 //it.summary =
             }
             findPreference<Preference>("key_about_whatsnew")?.let {
                 val tmp = context?.packageManager?.getInstallerPackageName(BuildConfig.APPLICATION_ID)
-                it.title = "What's new in: jQuarks v" + BuildConfig.VERSION_NAME
-                it.summary = "Updated: " + Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.lastUpdateTime!!).toString() +
+                it.title = context?.getString(R.string.pref_whatsnew) + BuildConfig.VERSION_NAME
+                it.summary = context?.getString(R.string.pref_updated) + Date(context?.packageManager?.getPackageInfo( BuildConfig.APPLICATION_ID, 0)?.lastUpdateTime!!).toString() +
                         if (tmp!= null) "\n\u3004" + tmp else ""
             }
             /*
@@ -169,15 +170,15 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 "key_about_notice" -> {
                     showZinfo(this.resources.openRawResource(R.raw.full_description).bufferedReader().use { it1 -> it1.readText() } +
-                            "\n" + context?.getString(R.string.pref_about)
-                            , "Notice"
+                            "\n" + context?.getString(R.string.pref_context)
+                            , context?.getString(R.string.pref_notice)!!
                             , true)
                     true
                 }
                 "key_about_whatsnew" -> {
                     showZinfo(this.resources.openRawResource(R.raw.whatsnew).bufferedReader().use { it1 -> it1.readText() } +
-                            "\n" + context?.getString(R.string.pref_about)
-                            , "Whats's new"
+                            "\n" + context?.getString(R.string.pref_context)
+                            , context?.getString(R.string.pref_whatsnew) + BuildConfig.VERSION_NAME
                             , true)
                     true
                 }

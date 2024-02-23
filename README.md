@@ -13,7 +13,7 @@ Ads blocker and favicon in search bar based on this: https://github.com/CarbonRO
  
 ### tab(s) manager:
  * tile & iconShortcut for allTabs kill
- * randomized UserAgent for each tab
+ * randomized UserAgent for each tab https://coveryourtracks.eff.org/kcarter?aat=1
  
 ### external launches:
  * local xml/mht/html/svg/eml, for both ^content^ (X-plore) & ^file^ (aosp/Files or GhostCommander)
@@ -28,10 +28,10 @@ Ads blocker and favicon in search bar based on this: https://github.com/CarbonRO
  * ping action, x509 and links to VirusTotal/MyWOT via sslCertificate screen
  
 ### new Settings
- * force NightMode in webview
+ * force NightMode in webview (min version 76!)
  * adjustable size for urlBar height
  * toggle URL vs Title in urlBar
- * info with UserAgent
+ * anti-tracing & info for UserAgent
  
 ### More Search-engine(s):
 chosen one (via /Settings/) triggered, from any selected text (anywhere via longpress)
@@ -41,6 +41,8 @@ chosen one (via /Settings/) triggered, from any selected text (anywhere via long
  * SearX
  * StartPage
  * Swisscows
+
+### (android TV menu compatibility (+ w.i.p. samsung Dex))
 
 ## AOSP compilation: ***packages/apps/Quarks/***
 ```
@@ -52,4 +54,4 @@ etc/sysconfig/?.xml
 ```
 >__\<hidden-api-whitelisted-app package="org.lineageos.jelly"/\>__
 
-prim-origin: https://github.com/LineageOS/android_packages_apps_Jelly
+prim-origin, Apache License v2.0 https://github.com/LineageOS/android_packages_apps_Jelly

@@ -27,13 +27,13 @@ buildscript {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     namespace = "org.lineageos.jelly"
 
     defaultConfig {
         applicationId = "com.oF2pks.jquarks"
         minSdk = 23
-        targetSdk = 32 //33onlyShare
+        targetSdk = 34 //33onlyShare
         versionCode = 23
         versionName = "1.0-23"
     }

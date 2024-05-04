@@ -291,6 +291,9 @@ class MainActivity : WebViewExtActivity(), SharedPreferences.OnSharedPreferenceC
             menuDialog.showAsDropdownMenu(urlBarLayout, sharedPreferencesExt.reachModeEnabled)
         }
 
+        CookieManager.getInstance()
+            .setAcceptCookie(incognito && sharedPreferencesExt.cookiesEnabled)
+
         webView.init(this, urlBarLayout, incognito)
         webView.isDesktopMode = desktopMode
         //webView.settings.domStorageEnabled = true

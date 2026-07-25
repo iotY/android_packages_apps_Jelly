@@ -20,9 +20,11 @@
         <item>Bing</item>
         <item>Brave</item>
         <item>DuckDuckGo</item>
+        <item>DuckDuckGo (HTML)</item>
         <item>Gibiru</item>
         <item>Google</item>
         <item>Google RAW (no AI)</item>
+        <item>Marginalia Search</item>
         <item>Mojeek</item>
         <item>Qwant</item>
         <item>SearX</item>
@@ -37,9 +39,11 @@
         <item>https://www.bing.com/search?q={searchTerms}</item>
         <item>https://search.brave.com/search?q={searchTerms}</item>
         <item>https://duckduckgo.com/?q={searchTerms}</item>
+        <item>https://html.duckduckgo.com/html/?q={searchTerms}</item>
         <item>https://gibiru.com/results.html?q={searchTerms}</item>
         <item>https://google.com/search?ie=UTF-8&amp;source=android-browser&amp;q={searchTerms}</item>
         <item>https://google.com/search?ie=UTF-8&amp;udm=14&amp;q={searchTerms}</item>
+        <item>https://marginalia-search.com/search?query={searchTerms}</item>
         <item>https://www.mojeek.com/search?q={searchTerms}&amp;emot=emotional</item>
         <item>https://www.qwant.com/?q={searchTerms}</item>
         <item>https://searx.neocities.org/?q={searchTerms}</item>
